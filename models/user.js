@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt-nodejs");
 
 const Schema = mongoose.Schema;
 
+const fundsSchema = require("./funds");
+
 //define our model
 const userSchema = new Schema({
   email: {
@@ -11,7 +13,9 @@ const userSchema = new Schema({
     trim: true,
     lowercase: true
   },
-  password: String
+  password: String,
+  funds: [fundsSchema],
+  expenses: []
 });
 
 // on save hook, encrypt password

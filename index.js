@@ -10,10 +10,9 @@ const router = require("./router");
 const app = express();
 
 // db setup
-mongoose.connect(
-  "mongodb://localhost:27017/auth",
-  { useNewUrlParser: true }
-);
+mongoose.connect("mongodb://localhost:27017/new-auth", {
+  useNewUrlParser: true
+});
 
 // app setup
 
@@ -30,4 +29,5 @@ const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 server.listen(port);
-console.log("server listening on port 8080");
+
+console.log(`server listening on port ${port}`);
