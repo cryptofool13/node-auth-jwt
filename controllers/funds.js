@@ -39,12 +39,12 @@ exports.addFundEntry = (req, res, next) => {
     $push: { funds: { $each: [newFundEntry], $sort: { timestamp: -1 } } }
   }).then((user, err) => {
     if (err) {
-      res.send({ error: err });
+      return res.send({ error: err });
     }
 
     // check if query returns an existing user
     if (!user) {
-      res.send({ error: "user does not exist" });
+      return res.send({ error: "user does not exist" });
     }
 
     res.send({ messgae: "funds updated" });
@@ -58,14 +58,17 @@ exports.getCurrentBalance = (req, res, next) => {
   // find by id to extract user's fund data
   User.findById(id).then((user, err) => {
     if (err) {
-      res.send({ error: err });
+      return res.send({ error: err });
     }
 
     // check if query returns an existing user
     if (!user) {
-      res.send({ error: "user does not exist" });
+      return res.send({ error: "user does not exist" });
     }
-
+    // check if funds data exists
+    if (!user.funds[0]) {
+      return res.send({ error: "no data to return" });
+    }
     // take first item in funds array (its sorted after every update)
     let currentFunds = user.funds[0].accounts;
 
@@ -81,10 +84,10 @@ exports.getPastBalances = (req, res, next) => {
   // find by id to get user
   User.findById(id).then((user, err) => {
     if (err) {
-      res.send({ error: err });
+      return res.send({ error: err });
     }
     if (!user) {
-      res.send({ error: "user does not exist" });
+      return res.send({ error: "user does not exist" });
     }
 
     // return fund entries from up to 30 days ago
