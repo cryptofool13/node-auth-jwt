@@ -32,7 +32,7 @@ exports.addExpenseItems = (req, res, next) => {
   });
 
   const newExpenseEntry = {
-    timestamp: new Date().getTime(),
+    timestamp: new Date(),
     items: items
   };
   let id = decodeToken(req.headers.authorization);
@@ -50,5 +50,69 @@ exports.addExpenseItems = (req, res, next) => {
 };
 
 // get expense list for current month
+exports.getCurrentExpensesLs = (req, res, next) => {
+  let id = decodeToken(req.headers.authorization);
+
+  let currentTime = new Date().getTime();
+
+  let expenses = [];
+
+  User.findById(id).then((user, err) => {
+    if (err) {
+      return res.send({ error: err });
+    }
+    if (!user) {
+      return res.send({ error: "user not found" });
+    }
+    if (!user.expenses.length) {
+      return res.send({ message: "no data present" });
+    }
+    // filter user's expense items by current month
+    user.expenses.forEach(entry => {
+      if (currentTime - entry.timestamp.getTime() < 2628000000) {
+        entry.items.forEach(item => {
+          expenses.push(item);
+        });
+      }
+    });
+    res.send({ data: expenses });
+  });
+};
 
 // get expense set for current month
+exports.getCurrentExpensesSet = (req, res, next) => {
+  let id = decodeToken(req.headers.authorization);
+
+  let currentTime = new Date().getTime();
+
+  let expenses = {};
+
+  User.findById(id).then((user, err) => {
+    if (err) {
+      return res.send({ error: err });
+    }
+    if (!user) {
+      return res.send({ error: "user not found" });
+    }
+    if (!user.expenses.length) {
+      return res.send({ message: "no data present" });
+    }
+
+    user.expenses.forEach(entry => {
+      if (currentTime - entry.timestamp.getTime() < 2628000000) {
+        // go throught entry and add each item, only if it isnt there yet, and keep track of total costs
+        entry.items.forEach(item => {
+          let label = item.label;
+          let cost = item.cost;
+
+          if (!expenses.hasOwnProperty(label)) {
+            expenses[label] = item.cost;
+          } else {
+            expenses[label] += cost;
+          }
+        });
+      }
+    });
+    res.send({ data: expenses });
+  });
+};

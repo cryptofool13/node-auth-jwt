@@ -28,7 +28,7 @@ exports.addFundEntry = (req, res, next) => {
   });
   // build temp fund entry
   const newFundEntry = {
-    timestamp: new Date().getTime(),
+    timestamp: new Date(),
     accounts: accounts
   };
   // pull user id from auth token

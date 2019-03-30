@@ -17,6 +17,12 @@ module.exports = app => {
   app.get("/funds/data", requireAuth, FundsController.getPastBalances);
   app.post("/funds", requireAuth, FundsController.addFundEntry);
   // expense routes
+  app.get("/spending/ls", requireAuth, ExpenseController.getCurrentExpensesLs);
+  app.get(
+    "/spending/set",
+    requireAuth,
+    ExpenseController.getCurrentExpensesSet
+  );
   app.post("/spending", requireAuth, ExpenseController.addExpenseItems);
   // auth routes
   app.post("/signin", requireSignin, Authentication.signin);
