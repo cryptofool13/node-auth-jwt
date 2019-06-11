@@ -1,4 +1,5 @@
 const jwt = require("jwt-simple");
+const ObjectID = require("mongodb").ObjectID;
 
 const config = require("../config");
 
@@ -20,14 +21,18 @@ exports.addExpenseItems = (req, res, next) => {
   if (!Array.isArray(expenses)) {
     return res.send({ error: "bad input: expenses must be an array" });
   }
+  if (!expenses[0]) {
+    return res.send({ error: "bad input: no data received" });
+  }
 
   let items = [];
 
-  expenses.forEach(item => {
+  expenses.forEach(({ label, cost, itemType }) => {
     items.push({
-      label: item.label,
-      cost: item.cost,
-      itemType: item.itemType
+      label,
+      cost,
+      itemType,
+      _id: new ObjectID()
     });
   });
 
@@ -65,17 +70,17 @@ exports.getCurrentExpensesLs = (req, res, next) => {
       return res.send({ error: "user not found" });
     }
     if (!user.expenses.length) {
-      return res.send({ message: "no data present" });
+      return res.send({ error: "no data present" });
     }
     // filter user's expense items by current month
     user.expenses.forEach(entry => {
-      if (currentTime - entry.timestamp.getTime() < 2628000000) {
+      if (currentTime - entry.timestamp.getTime() < 657000000) {
         entry.items.forEach(item => {
           expenses.push(item);
         });
       }
     });
-    res.send({ data: expenses });
+    res.send(expenses);
   });
 };
 

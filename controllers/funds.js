@@ -11,7 +11,7 @@ function decodeToken(token) {
 
 exports.addFundEntry = (req, res, next) => {
   // check for user input
-  if (!req.body.funds) {
+  if (!req.body.funds[0]) {
     return res.send({ error: "bad input: no funds array found" });
   }
 
@@ -23,8 +23,8 @@ exports.addFundEntry = (req, res, next) => {
 
   let accounts = [];
   // build temp array
-  funds.forEach(fund => {
-    accounts.push({ name: fund.name, balance: fund.balance });
+  funds.forEach(({ name, balance }) => {
+    accounts.push({ name, balance });
   });
   // build temp fund entry
   const newFundEntry = {
@@ -89,7 +89,9 @@ exports.getPastBalances = (req, res, next) => {
     if (!user) {
       return res.send({ error: "user does not exist" });
     }
-
+    if (!user.funds[0]) {
+      return res.send({ error: "no data to return" });
+    }
     // return fund entries from up to 30 days ago
     let funds = user.funds;
     funds = funds.slice(0, 30);

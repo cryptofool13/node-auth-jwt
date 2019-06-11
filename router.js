@@ -13,18 +13,22 @@ module.exports = app => {
     res.send("hi");
   });
   // funds routes
-  app.get("/funds", requireAuth, FundsController.getCurrentBalance);
-  app.get("/funds/data", requireAuth, FundsController.getPastBalances);
-  app.post("/funds", requireAuth, FundsController.addFundEntry);
+  app.get("/api/funds", requireAuth, FundsController.getCurrentBalance);
+  app.get("/api/funds/data", requireAuth, FundsController.getPastBalances);
+  app.post("/api/funds", requireAuth, FundsController.addFundEntry);
   // expense routes
-  app.get("/spending/ls", requireAuth, ExpenseController.getCurrentExpensesLs);
   app.get(
-    "/spending/set",
+    "/api/spending/ls",
+    requireAuth,
+    ExpenseController.getCurrentExpensesLs
+  );
+  app.get(
+    "/api/spending/set",
     requireAuth,
     ExpenseController.getCurrentExpensesSet
   );
-  app.post("/spending", requireAuth, ExpenseController.addExpenseItems);
+  app.post("/api/spending", requireAuth, ExpenseController.addExpenseItems);
   // auth routes
-  app.post("/signin", requireSignin, Authentication.signin);
-  app.post("/signup", Authentication.signup);
+  app.post("/api/signin", requireSignin, Authentication.signin);
+  app.post("/api/signup", Authentication.signup);
 };
