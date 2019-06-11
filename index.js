@@ -1,3 +1,4 @@
+require("dotenv").config();
 // main starting point of application
 const express = require("express");
 const http = require("http");
@@ -5,14 +6,13 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const db = require("./config").dbName;
 
 const router = require("./router");
 
 const app = express();
 
 // db setup
-mongoose.connect(db, {
+mongoose.connect(process.env.DB_NAME, {
   useNewUrlParser: true
 });
 
@@ -28,7 +28,7 @@ router(app);
 
 // server setup
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 const server = http.createServer(app);
 

@@ -1,11 +1,9 @@
 const jwt = require("jwt-simple");
 
-const config = require("../config");
-
 const User = require("../models/user");
 
 function decodeToken(token) {
-  let payload = jwt.decode(token, config.secret);
+  let payload = jwt.decode(token, process.env.SECRET);
   return payload.sub;
 }
 
