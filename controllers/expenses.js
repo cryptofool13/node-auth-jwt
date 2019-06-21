@@ -1,7 +1,7 @@
-const jwt = require("jwt-simple");
-const ObjectID = require("mongodb").ObjectID;
+const jwt = require('jwt-simple');
+const ObjectID = require('mongodb').ObjectID;
 
-const User = require("../models/user");
+const User = require('../models/user');
 
 function decodeToken(token) {
   let payload = jwt.decode(token, process.env.SECRET);
@@ -12,43 +12,43 @@ function decodeToken(token) {
 exports.addExpenseItems = (req, res, next) => {
   // check for user input
   if (!req.body.expenses) {
-    return res.send({ error: "bad input: no expenses array" });
+    return res.send({error: 'bad input: no expenses array'});
   }
   let expenses = req.body.expenses;
   // validate user input is array
   if (!Array.isArray(expenses)) {
-    return res.send({ error: "bad input: expenses must be an array" });
+    return res.send({error: 'bad input: expenses must be an array'});
   }
   if (!expenses[0]) {
-    return res.send({ error: "bad input: no data received" });
+    return res.send({error: 'bad input: no data received'});
   }
 
   let items = [];
 
-  expenses.forEach(({ label, cost, itemType }) => {
+  expenses.forEach(({label, cost, itemType}) => {
     items.push({
       label,
       cost,
       itemType,
-      _id: new ObjectID()
+      _id: new ObjectID(),
     });
   });
 
   const newExpenseEntry = {
     timestamp: new Date(),
-    items: items
+    items: items,
   };
   let id = decodeToken(req.headers.authorization);
   User.findByIdAndUpdate(id, {
-    $push: { expenses: { $each: [newExpenseEntry], $sort: { timestamp: -1 } } }
+    $push: {expenses: {$each: [newExpenseEntry], $sort: {timestamp: -1}}},
   }).then((user, err) => {
     if (err) {
-      return res.send({ error: err });
+      return res.send({error: err});
     }
     if (!user) {
-      return res.send({ error: "user does not exist" });
+      return res.send({error: 'user does not exist'});
     }
-    res.send({ message: "expenses updated", data: user });
+    res.send({message: 'expenses updated', data: user});
   });
 };
 
@@ -62,13 +62,13 @@ exports.getCurrentExpensesLs = (req, res, next) => {
 
   User.findById(id).then((user, err) => {
     if (err) {
-      return res.send({ error: err });
+      return res.send({error: err});
     }
     if (!user) {
-      return res.send({ error: "user not found" });
+      return res.send({error: 'user not found'});
     }
     if (!user.expenses.length) {
-      return res.send({ error: "no data present" });
+      return res.send({error: 'no data present'});
     }
     // filter user's expense items by current month
     user.expenses.forEach(entry => {
@@ -92,13 +92,13 @@ exports.getCurrentExpensesSet = (req, res, next) => {
 
   User.findById(id).then((user, err) => {
     if (err) {
-      return res.send({ error: err });
+      return res.send({error: err});
     }
     if (!user) {
-      return res.send({ error: "user not found" });
+      return res.send({error: 'user not found'});
     }
     if (!user.expenses.length) {
-      return res.send({ message: "no data present" });
+      return res.send({message: 'no data present'});
     }
 
     user.expenses.forEach(entry => {
@@ -106,16 +106,17 @@ exports.getCurrentExpensesSet = (req, res, next) => {
         // go throught entry and add each item, only if it isnt there yet, and keep track of total costs
         entry.items.forEach(item => {
           let label = item.label;
-          let cost = item.cost;
+          let cost = Number(item.cost);
+          console.log('item', item, ', cost', cost);
 
           if (!expenses.hasOwnProperty(label)) {
-            expenses[label] = item.cost;
+            expenses[label] = cost;
           } else {
             expenses[label] += cost;
           }
         });
       }
     });
-    res.send({ data: expenses });
+    res.send({data: expenses});
   });
 };
